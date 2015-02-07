@@ -17,6 +17,7 @@ type HTTPStatusConfig struct {
 	Name                 string
 	URL                  *url.URL
 	Codes                []int
+	CheckInterval        time.Duration
 	NotificationInterval time.Duration
 	Verify               bool
 	Timeout              time.Duration
@@ -54,6 +55,11 @@ func NewHTTPStatus(conf map[string]interface{}) Monitor {
 		}
 	}
 
+	var checkInterval time.Duration = time.Second * 10
+	if ci, ok := conf["check_interval"]; ok {
+		checkInterval, err = time.ParseDuration(ci.(string))
+	}
+
 	var notificationInterval time.Duration = time.Second * 60
 	if ni, ok := conf["notification_interval"]; ok {
 		notificationInterval, err = time.ParseDuration(ni.(string))
@@ -78,6 +84,7 @@ func NewHTTPStatus(conf map[string]interface{}) Monitor {
 		Name:                 name,
 		URL:                  pURL,
 		Codes:                codes,
+		CheckInterval:        checkInterval,
 		NotificationInterval: notificationInterval,
 		Verify:               verify,
 		Timeout:              timeout,
@@ -100,7 +107,7 @@ func (m *HTTPStatus) Watch(statusChan chan *status.Status) {
 	for {
 		m.Check()
 		statusChan <- m.status
-		time.Sleep(time.Second * 10)
+		time.Sleep(m.config.CheckInterval)
 	}
 }
 
