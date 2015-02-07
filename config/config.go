@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"log"
 	"path/filepath"
+	"strings"
 
 	"github.com/sivel/overseer/monitor"
 	"github.com/sivel/overseer/notifier"
@@ -21,6 +22,9 @@ func getNotifiers(configPath string) []notifier.Notifier {
 	}
 	var notifiers []notifier.Notifier
 	for _, f := range files {
+		if !strings.HasSuffix(f.Name(), ".json") {
+			continue
+		}
 		var tmp interface{}
 		text, err := ioutil.ReadFile(filepath.Join(notifierPath, f.Name()))
 		if err != nil {
@@ -51,6 +55,9 @@ func getMonitors(configPath string) []monitor.Monitor {
 	}
 	var monitors []monitor.Monitor
 	for _, f := range files {
+		if !strings.HasSuffix(f.Name(), ".json") {
+			continue
+		}
 		var tmp interface{}
 		text, err := ioutil.ReadFile(filepath.Join(monitorPath, f.Name()))
 		if err != nil {
