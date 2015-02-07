@@ -19,6 +19,8 @@ func GetMonitor(monitorType string) (NewMonitor, error) {
 	switch monitorType {
 	case "http-status":
 		return NewHTTPStatus, nil
+	case "http-content":
+		return NewHTTPContent, nil
 	}
 	return nil, errors.New(fmt.Sprintf("Unsuppported notifier type: %s", monitorType))
 }
