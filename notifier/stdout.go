@@ -1,7 +1,8 @@
 package notifier
 
 import (
-	"fmt"
+	"log"
+	"time"
 
 	"github.com/sivel/overseer/status"
 )
@@ -22,7 +23,13 @@ func NewStdout(conf map[string]interface{}) Notifier {
 	return notifier
 }
 
-func (n *Stdout) Notify(status *status.Status) {
-	fmt.Println("Stdout notified, status obj follows")
-	fmt.Println(status)
+func (n *Stdout) Notify(stat *status.Status) {
+	log.Printf(
+		"[%s] %s: %s [%dms] [%s]\n",
+		stateString(stat),
+		stat.MonitorName,
+		stat.Message,
+		stat.CheckDuration/1000000,
+		time.Since(stat.StartOfCurrentStatus),
+	)
 }

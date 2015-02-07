@@ -1,6 +1,8 @@
 package status
 
-import "time"
+import (
+	"time"
+)
 
 const (
 	DOWN    int = 0
@@ -9,8 +11,10 @@ const (
 )
 
 type Status struct {
+	MonitorName          string
 	Current              int
 	Last                 int
+	NotificationInterval time.Duration
 	StartOfCurrentStatus time.Time
 	LastNotification     time.Time
 	CheckDuration        int64
@@ -18,10 +22,16 @@ type Status struct {
 	Time                 time.Time
 }
 
-func NewStatus(current int, last int, startOfCurrentStatus time.Time, lastNotification time.Time, checkDuration int64, message string) *Status {
+func NewStatus(
+	monitorName string, current int, last int,
+	notificationInterval time.Duration, startOfCurrentStatus time.Time,
+	lastNotification time.Time, checkDuration int64, message string,
+) *Status {
 	return &Status{
+		MonitorName:          monitorName,
 		Current:              current,
 		Last:                 last,
+		NotificationInterval: notificationInterval,
 		StartOfCurrentStatus: startOfCurrentStatus,
 		LastNotification:     lastNotification,
 		CheckDuration:        checkDuration,

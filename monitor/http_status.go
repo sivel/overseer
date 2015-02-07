@@ -14,7 +14,7 @@ import (
 )
 
 type HTTPStatusConfig struct {
-	Type                 string
+	Name                 string
 	URL                  *url.URL
 	Codes                []int
 	NotificationInterval time.Duration
@@ -40,6 +40,11 @@ func NewHTTPStatus(conf map[string]interface{}) Monitor {
 		} else if !ok {
 			log.Fatalf("No URL provided")
 		}
+	}
+
+	var name string = pURL.String()
+	if nameInterface, ok := conf["name"]; ok {
+		name = nameInterface.(string)
 	}
 
 	var codes []int = []int{200}
@@ -70,7 +75,7 @@ func NewHTTPStatus(conf map[string]interface{}) Monitor {
 	}
 
 	monitor.config = &HTTPStatusConfig{
-		Type:                 conf["type"].(string),
+		Name:                 name,
 		URL:                  pURL,
 		Codes:                codes,
 		NotificationInterval: notificationInterval,
@@ -78,7 +83,16 @@ func NewHTTPStatus(conf map[string]interface{}) Monitor {
 		Timeout:              timeout,
 		Method:               method,
 	}
-	monitor.status = status.NewStatus(status.UNKNOWN, status.UNKNOWN, time.Now(), time.Now(), 0, "")
+	monitor.status = status.NewStatus(
+		name,
+		status.UNKNOWN,
+		status.UNKNOWN,
+		notificationInterval,
+		time.Now(),
+		time.Now(),
+		0,
+		"",
+	)
 	return monitor
 }
 
@@ -109,24 +123,6 @@ func checkChanged(current int, last int, startOfLastStatus time.Time) (bool, tim
 	}
 	return changed, start
 }
-
-/*func shouldNotify(current int, last int, lastNotification time.Time, notificationInterval time.Duration) (bool, time.Time) {
-	var notify bool = false
-	var notifyTime time.Time = lastNotification
-	if current == last && current == status.UP {
-		notify = false
-		fmt.Print("1")
-	} else if current != last && current == status.UP && last == status.UNKNOWN {
-		notify = false
-		fmt.Print("2")
-	} else if time.Since(lastNotification) > notificationInterval {
-		fmt.Print("3")
-		notify = true
-		notifyTime = time.Now()
-	}
-	return notify, notifyTime
-
-}*/
 
 func (m *HTTPStatus) Check() {
 	fmt.Println("HTTPStatus Check Running for " + m.config.URL.String())
@@ -165,5 +161,14 @@ func (m *HTTPStatus) Check() {
 
 	_, start := checkChanged(current, m.status.Current, m.status.StartOfCurrentStatus)
 
-	m.status = status.NewStatus(current, m.status.Current, start, m.status.LastNotification, duration, message)
+	m.status = status.NewStatus(
+		m.config.Name,
+		current,
+		m.status.Current,
+		m.config.NotificationInterval,
+		start,
+		m.status.LastNotification,
+		duration,
+		message,
+	)
 }

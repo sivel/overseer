@@ -27,9 +27,12 @@ func (r *Runner) Loop() {
 	}
 
 	for {
-		status := <-r.StatusChan
+		stat := <-r.StatusChan
+		if !notifier.ShouldNotify(stat) {
+			continue
+		}
 		for _, notifier := range r.Notifiers {
-			notifier.Notify(status)
+			notifier.Notify(stat)
 		}
 	}
 }
