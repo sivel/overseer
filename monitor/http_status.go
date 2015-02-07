@@ -121,16 +121,6 @@ func isValidCode(code int, codes []int) bool {
 	return valid
 }
 
-func checkChanged(current int, last int, startOfLastStatus time.Time) (bool, time.Time) {
-	var start time.Time = startOfLastStatus
-	var changed bool = false
-	if current != last {
-		changed = true
-		start = time.Now()
-	}
-	return changed, start
-}
-
 func (m *HTTPStatus) Check() {
 	fmt.Println("HTTPStatus Check Running for " + m.config.URL.String())
 
