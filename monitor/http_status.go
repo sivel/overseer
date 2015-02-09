@@ -23,7 +23,7 @@ type HTTPStatusConfig struct {
 	NotificationIntervalString string `json:"notification_interval"`
 	NotificationInterval       time.Duration
 	Verify                     bool
-	TimeoutString              string
+	TimeoutString              string `json:"timeout"`
 	Timeout                    time.Duration
 	Method                     string
 }
