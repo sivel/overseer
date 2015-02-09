@@ -25,8 +25,8 @@ func GetMonitor(monitorType string) (NewMonitor, error) {
 	return nil, errors.New(fmt.Sprintf("Unsuppported notifier type: %s", monitorType))
 }
 
-func checkChanged(current int, last int, startOfLastContent time.Time) (bool, time.Time) {
-	var start time.Time = startOfLastContent
+func checkChanged(current int, last int, startOfLastStatus time.Time) (bool, time.Time) {
+	var start time.Time = startOfLastStatus
 	var changed bool = false
 	if current != last {
 		changed = true
