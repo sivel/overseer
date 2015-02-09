@@ -112,8 +112,6 @@ func isValidCode(code int, codes []int) bool {
 }
 
 func (m *HTTPStatus) Check() {
-	fmt.Println("HTTPStatus Check Running for " + m.config.URL.String())
-
 	transport := http.Transport{
 		Dial: func(network, addr string) (net.Conn, error) {
 			return net.DialTimeout(network, addr, m.config.Timeout)

@@ -104,8 +104,6 @@ func (m *HTTPContent) Watch(statusChan chan *status.Status) {
 }
 
 func (m *HTTPContent) Check() {
-	fmt.Println("HTTPContent Check Running for " + m.config.URL.String())
-
 	transport := http.Transport{
 		Dial: func(network, addr string) (net.Conn, error) {
 			return net.DialTimeout(network, addr, m.config.Timeout)

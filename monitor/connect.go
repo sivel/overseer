@@ -28,7 +28,6 @@ type Connect struct {
 }
 
 func NewConnect(conf []byte) Monitor {
-	fmt.Println("New")
 	var err error
 	monitor := new(Connect)
 	var config ConnectConfig
@@ -76,7 +75,6 @@ func NewConnect(conf []byte) Monitor {
 		0,
 		"",
 	)
-	fmt.Println(monitor)
 	return monitor
 }
 
@@ -90,11 +88,8 @@ func (m *Connect) Watch(statusChan chan *status.Status) {
 
 func (m *Connect) Check() {
 	requestStart := time.Now()
-	fmt.Println("before")
 	conn, err := net.DialTimeout("tcp", fmt.Sprintf("%s:%d", m.config.Host, m.config.Port), m.config.Timeout)
-	fmt.Println("after")
 	duration := time.Now().UnixNano() - requestStart.UnixNano()
-	fmt.Println(duration)
 
 	var message string = "OK"
 	var current int = status.UNKNOWN
