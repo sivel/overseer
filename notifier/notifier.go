@@ -20,6 +20,8 @@ func GetNotifier(notifierType string) (NewNotifier, error) {
 		return NewStdout, nil
 	case "mailgun":
 		return NewMailgun, nil
+	case "slack":
+		return NewSlack, nil
 	}
 	return nil, errors.New(fmt.Sprintf("Unsuppported notifier type: %s", notifierType))
 }
