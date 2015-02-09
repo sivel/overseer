@@ -12,7 +12,7 @@ type Notifier interface {
 	Notify(*status.Status)
 }
 
-type NewNotifier func(map[string]interface{}) Notifier
+type NewNotifier func([]byte) Notifier
 
 func GetNotifier(notifierType string) (NewNotifier, error) {
 	switch notifierType {

@@ -2,6 +2,7 @@ package monitor
 
 import (
 	"crypto/tls"
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -9,21 +10,24 @@ import (
 	"net/http"
 	"net/url"
 	"regexp"
-	"strings"
 	"time"
 
 	"github.com/sivel/overseer/status"
 )
 
 type HTTPContentConfig struct {
-	Name                 string
-	URL                  *url.URL
-	Content              string
-	CheckInterval        time.Duration
-	NotificationInterval time.Duration
-	Verify               bool
-	Timeout              time.Duration
-	Method               string
+	Name                       string
+	URLString                  string `json:"url"`
+	URL                        *url.URL
+	Content                    string
+	CheckIntervalString        string `json:"check_interval"`
+	CheckInterval              time.Duration
+	NotificationIntervalString string `json:"notification_interval"`
+	NotificationInterval       time.Duration
+	Verify                     bool
+	TimeoutString              string `json:"timeout"`
+	Timeout                    time.Duration
+	Method                     string
 }
 
 type HTTPContent struct {
@@ -31,72 +35,58 @@ type HTTPContent struct {
 	status *status.Status
 }
 
-func NewHTTPContent(conf map[string]interface{}) Monitor {
+func NewHTTPContent(conf []byte) Monitor {
 	var err error
 	monitor := new(HTTPContent)
-
-	var pURL *url.URL
-	if urlInterface, ok := conf["url"]; ok {
-		pURL, err = url.Parse(urlInterface.(string))
-		if err != nil {
-			log.Fatalf("Invalid URL: %s", conf["url"].(string))
-		} else if !ok {
-			log.Fatalf("No URL provided")
-		}
+	var config HTTPContentConfig
+	err = json.Unmarshal(conf, &config)
+	if err != nil {
+		log.Fatalf("Failed to parse config: %s", err)
+	} else {
+		monitor.config = &config
 	}
 
-	var content string
-	if contentInterface, ok := conf["content"]; ok {
-		content = contentInterface.(string)
-	} else {
+	if config.URLString == "" {
+		log.Fatalf("No URL provided")
+	}
+
+	config.URL, err = url.Parse(config.URLString)
+	if err != nil {
+		log.Fatalf("Invalid URL provided: %s", config.URLString)
+	}
+
+	if config.Content == "" {
 		log.Fatal("No content match provided")
 	}
 
-	var name string = pURL.String()
-	if nameInterface, ok := conf["name"]; ok {
-		name = nameInterface.(string)
+	if config.Name == "" {
+		config.Name = config.URL.String()
 	}
 
-	var checkInterval time.Duration = time.Second * 10
-	if ci, ok := conf["check_interval"]; ok {
-		checkInterval, err = time.ParseDuration(ci.(string))
+	config.CheckInterval, err = time.ParseDuration(config.CheckIntervalString)
+	if err != nil {
+		config.CheckInterval = time.Second * 10
 	}
 
-	var notificationInterval time.Duration = time.Second * 60
-	if ni, ok := conf["notification_interval"]; ok {
-		notificationInterval, err = time.ParseDuration(ni.(string))
+	config.NotificationInterval, err = time.ParseDuration(config.NotificationIntervalString)
+	if err != nil {
+		config.NotificationInterval = time.Second * 60
 	}
 
-	var verify bool = false
-	if verifyInterface, ok := conf["verify"]; ok {
-		verify = verifyInterface.(bool)
+	config.Timeout, err = time.ParseDuration(config.TimeoutString)
+	if err != nil {
+		config.Timeout = time.Second * 2
 	}
 
-	var timeout time.Duration = time.Second * 2
-	if timeoutInterface, ok := conf["timeout"]; ok {
-		timeout, _ = time.ParseDuration(timeoutInterface.(string))
+	if config.Method == "" {
+		config.Method = "HEAD"
 	}
 
-	var method string = "HEAD"
-	if methodInterface, ok := conf["method"]; ok {
-		method = strings.ToUpper(methodInterface.(string))
-	}
-
-	monitor.config = &HTTPContentConfig{
-		Name:                 name,
-		URL:                  pURL,
-		Content:              content,
-		CheckInterval:        checkInterval,
-		NotificationInterval: notificationInterval,
-		Verify:               verify,
-		Timeout:              timeout,
-		Method:               method,
-	}
 	monitor.status = status.NewStatus(
-		name,
+		config.Name,
 		status.UNKNOWN,
 		status.UNKNOWN,
-		notificationInterval,
+		config.NotificationInterval,
 		time.Now(),
 		time.Now(),
 		0,

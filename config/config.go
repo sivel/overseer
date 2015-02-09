@@ -14,6 +14,10 @@ import (
 type Config struct {
 }
 
+type NotifierType struct {
+	Type string
+}
+
 func getNotifiers(configPath string) []notifier.Notifier {
 	notifierPath := filepath.Join(configPath, "notifiers")
 	files, err := ioutil.ReadDir(notifierPath)
@@ -25,7 +29,7 @@ func getNotifiers(configPath string) []notifier.Notifier {
 		if !strings.HasSuffix(f.Name(), ".json") {
 			continue
 		}
-		var tmp interface{}
+		var tmp NotifierType
 		text, err := ioutil.ReadFile(filepath.Join(notifierPath, f.Name()))
 		if err != nil {
 			continue
@@ -34,15 +38,11 @@ func getNotifiers(configPath string) []notifier.Notifier {
 		if err != nil {
 			continue
 		}
-		nConf := tmp.(map[string]interface{})
-		if notifierType, ok := nConf["type"]; ok {
-			nc, err := notifier.GetNotifier(notifierType.(string))
-			if err != nil {
-				continue
-			}
-			conf := nc(nConf)
-			notifiers = append(notifiers, conf)
+		notifier, err := notifier.GetNotifier(tmp.Type)
+		if err != nil {
+			continue
 		}
+		notifiers = append(notifiers, notifier(text))
 	}
 	return notifiers
 }
@@ -58,7 +58,7 @@ func getMonitors(configPath string) []monitor.Monitor {
 		if !strings.HasSuffix(f.Name(), ".json") {
 			continue
 		}
-		var tmp interface{}
+		var tmp NotifierType
 		text, err := ioutil.ReadFile(filepath.Join(monitorPath, f.Name()))
 		if err != nil {
 			continue
@@ -67,15 +67,11 @@ func getMonitors(configPath string) []monitor.Monitor {
 		if err != nil {
 			continue
 		}
-		mConf := tmp.(map[string]interface{})
-		if monitorType, ok := mConf["type"]; ok {
-			mc, err := monitor.GetMonitor(monitorType.(string))
-			if err != nil {
-				continue
-			}
-			conf := mc(mConf)
-			monitors = append(monitors, conf)
+		monitor, err := monitor.GetMonitor(tmp.Type)
+		if err != nil {
+			continue
 		}
+		monitors = append(monitors, monitor(text))
 	}
 	return monitors
 }

@@ -1,6 +1,7 @@
 package notifier
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"time"
@@ -20,45 +21,33 @@ type Mailgun struct {
 	config *MailgunConfig
 }
 
-func NewMailgun(conf map[string]interface{}) Notifier {
+func NewMailgun(conf []byte) Notifier {
 	notifier := new(Mailgun)
 
-	var domain string
-	if domainInterface, ok := conf["domain"]; ok {
-		domain = domainInterface.(string)
+	var config MailgunConfig
+	err := json.Unmarshal(conf, &config)
+	if err != nil {
+		log.Fatalf("Failed to parse config: %s", err)
 	} else {
+		notifier.config = &config
+	}
+
+	if config.Domain == "" {
 		log.Fatal("Mailgun domain not provided")
 	}
 
-	var apiKey string
-	if apiKeyInterface, ok := conf["apikey"]; ok {
-		apiKey = apiKeyInterface.(string)
-	} else {
+	if config.APIKey == "" {
 		log.Fatal("Mailgun API Key not provided")
 	}
 
-	var from string
-	if fromInterface, ok := conf["from"]; ok {
-		from = fromInterface.(string)
-	} else {
+	if config.From == "" {
 		log.Fatal("Mailgun from address not provided")
 	}
 
-	var to []string
-	if toInterface, ok := conf["to"]; ok {
-		for _, addr := range toInterface.([]interface{}) {
-			to = append(to, addr.(string))
-		}
-	} else {
+	if len(config.To) == 0 {
 		log.Fatal("Mailgun to address list not provided")
 	}
 
-	notifier.config = &MailgunConfig{
-		Domain: domain,
-		APIKey: apiKey,
-		From:   from,
-		To:     to,
-	}
 	return notifier
 }
 

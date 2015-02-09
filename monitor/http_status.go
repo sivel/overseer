@@ -2,26 +2,30 @@ package monitor
 
 import (
 	"crypto/tls"
+	"encoding/json"
 	"fmt"
 	"log"
 	"net"
 	"net/http"
 	"net/url"
-	"strings"
 	"time"
 
 	"github.com/sivel/overseer/status"
 )
 
 type HTTPStatusConfig struct {
-	Name                 string
-	URL                  *url.URL
-	Codes                []int
-	CheckInterval        time.Duration
-	NotificationInterval time.Duration
-	Verify               bool
-	Timeout              time.Duration
-	Method               string
+	Name                       string
+	URLString                  string `json:"url"`
+	URL                        *url.URL
+	Codes                      []int
+	CheckIntervalString        string `json:"check_interval"`
+	CheckInterval              time.Duration
+	NotificationIntervalString string `json:"notification_interval"`
+	NotificationInterval       time.Duration
+	Verify                     bool
+	TimeoutString              string
+	Timeout                    time.Duration
+	Method                     string
 }
 
 type HTTPStatus struct {
@@ -29,72 +33,58 @@ type HTTPStatus struct {
 	status *status.Status
 }
 
-func NewHTTPStatus(conf map[string]interface{}) Monitor {
+func NewHTTPStatus(conf []byte) Monitor {
 	var err error
 	monitor := new(HTTPStatus)
-
-	var pURL *url.URL
-	if urlInterface, ok := conf["url"]; ok {
-		pURL, err = url.Parse(urlInterface.(string))
-		if err != nil {
-			log.Fatalf("Invalid URL: %s", conf["url"].(string))
-		} else if !ok {
-			log.Fatalf("No URL provided")
-		}
+	var config HTTPStatusConfig
+	err = json.Unmarshal(conf, &config)
+	if err != nil {
+		log.Fatalf("Failed to parse config: %s", err)
+	} else {
+		monitor.config = &config
 	}
 
-	var name string = pURL.String()
-	if nameInterface, ok := conf["name"]; ok {
-		name = nameInterface.(string)
+	if config.URLString == "" {
+		log.Fatalf("No URL provided")
 	}
 
-	var codes []int = []int{200}
-	if codesInterface, ok := conf["codes"]; ok {
-		for _, code := range codesInterface.([]interface{}) {
-			codes = append(codes, int(code.(float64)))
-		}
+	config.URL, err = url.Parse(config.URLString)
+	if err != nil {
+		log.Fatalf("Invalid URL provided: %s", config.URLString)
 	}
 
-	var checkInterval time.Duration = time.Second * 10
-	if ci, ok := conf["check_interval"]; ok {
-		checkInterval, err = time.ParseDuration(ci.(string))
+	if config.Name == "" {
+		config.Name = config.URL.String()
 	}
 
-	var notificationInterval time.Duration = time.Second * 60
-	if ni, ok := conf["notification_interval"]; ok {
-		notificationInterval, err = time.ParseDuration(ni.(string))
+	if len(config.Codes) == 0 {
+		config.Codes = []int{200}
 	}
 
-	var verify bool = false
-	if verifyInterface, ok := conf["verify"]; ok {
-		verify = verifyInterface.(bool)
+	config.CheckInterval, err = time.ParseDuration(config.CheckIntervalString)
+	if err != nil {
+		config.CheckInterval = time.Second * 10
 	}
 
-	var timeout time.Duration = time.Second * 2
-	if timeoutInterface, ok := conf["timeout"]; ok {
-		timeout, _ = time.ParseDuration(timeoutInterface.(string))
+	config.NotificationInterval, err = time.ParseDuration(config.NotificationIntervalString)
+	if err != nil {
+		config.NotificationInterval = time.Second * 60
 	}
 
-	var method string = "HEAD"
-	if methodInterface, ok := conf["method"]; ok {
-		method = strings.ToUpper(methodInterface.(string))
+	config.Timeout, err = time.ParseDuration(config.TimeoutString)
+	if err != nil {
+		config.Timeout = time.Second * 2
 	}
 
-	monitor.config = &HTTPStatusConfig{
-		Name:                 name,
-		URL:                  pURL,
-		Codes:                codes,
-		CheckInterval:        checkInterval,
-		NotificationInterval: notificationInterval,
-		Verify:               verify,
-		Timeout:              timeout,
-		Method:               method,
+	if config.Method == "" {
+		config.Method = "HEAD"
 	}
+
 	monitor.status = status.NewStatus(
-		name,
+		config.Name,
 		status.UNKNOWN,
 		status.UNKNOWN,
-		notificationInterval,
+		config.NotificationInterval,
 		time.Now(),
 		time.Now(),
 		0,

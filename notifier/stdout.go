@@ -1,6 +1,7 @@
 package notifier
 
 import (
+	"encoding/json"
 	"log"
 	"time"
 
@@ -8,18 +9,22 @@ import (
 )
 
 type StdoutConfig struct {
-	Type          string
-	Someting      int
-	SomethingElse int
+	Type string
 }
 
 type Stdout struct {
 	config *StdoutConfig
 }
 
-func NewStdout(conf map[string]interface{}) Notifier {
+func NewStdout(conf []byte) Notifier {
 	notifier := new(Stdout)
-	notifier.config = &StdoutConfig{}
+	var config StdoutConfig
+	err := json.Unmarshal(conf, &config)
+	if err != nil {
+		log.Fatalf("Failed to parse config: %s", err)
+	} else {
+		notifier.config = &config
+	}
 	return notifier
 }
 
