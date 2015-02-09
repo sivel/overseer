@@ -32,11 +32,11 @@ func getNotifiers(configPath string) []notifier.Notifier {
 		var tmp NotifierType
 		text, err := ioutil.ReadFile(filepath.Join(notifierPath, f.Name()))
 		if err != nil {
-			continue
+			log.Printf("Could not read configuration file: %s", f.Name())
 		}
 		err = json.Unmarshal(text, &tmp)
 		if err != nil {
-			continue
+			log.Printf("Configuration file not valid JSON: %s", f.Name())
 		}
 		notifier, err := notifier.GetNotifier(tmp.Type)
 		if err != nil {
@@ -61,11 +61,11 @@ func getMonitors(configPath string) []monitor.Monitor {
 		var tmp NotifierType
 		text, err := ioutil.ReadFile(filepath.Join(monitorPath, f.Name()))
 		if err != nil {
-			continue
+			log.Printf("Could not read configuration file: %s", f.Name())
 		}
 		err = json.Unmarshal(text, &tmp)
 		if err != nil {
-			continue
+			log.Printf("Configuration file not valid JSON: %s", f.Name())
 		}
 		monitor, err := monitor.GetMonitor(tmp.Type)
 		if err != nil {

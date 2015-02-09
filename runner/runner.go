@@ -1,6 +1,8 @@
 package runner
 
 import (
+	"log"
+
 	"github.com/sivel/overseer/monitor"
 	"github.com/sivel/overseer/notifier"
 	"github.com/sivel/overseer/status"
@@ -22,6 +24,10 @@ func NewRunner(monitors []monitor.Monitor, notifiers []notifier.Notifier) *Runne
 }
 
 func (r *Runner) Loop() {
+	if len(r.Monitors) == 0 {
+		log.Fatalf("No monitors are configured. Exiting...")
+	}
+
 	for _, monitor := range r.Monitors {
 		go monitor.Watch(r.StatusChan)
 	}
