@@ -38,7 +38,15 @@ func (r *Runner) Loop() {
 			continue
 		}
 		for _, notifier := range r.Notifiers {
-			notifier.Notify(stat)
+			if len(stat.Notifiers) > 0 {
+				for _, notifierName := range stat.Notifiers {
+					if notifier.Name() == notifierName {
+						notifier.Notify(stat)
+					}
+				}
+			} else {
+				notifier.Notify(stat)
+			}
 		}
 	}
 }

@@ -34,6 +34,10 @@ func NewStdout(conf []byte) Notifier {
 	return notifier
 }
 
+func (n *Stdout) Name() string {
+	return n.config.Name
+}
+
 func (n *Stdout) Notify(stat *status.Status) {
 	log.Printf(
 		"[%s] %s: %s [%dms] [%s]\n",

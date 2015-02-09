@@ -28,6 +28,7 @@ type HTTPContentConfig struct {
 	TimeoutString              string `json:"timeout"`
 	Timeout                    time.Duration
 	Method                     string
+	Notifiers                  []string
 }
 
 type HTTPContent struct {
@@ -91,6 +92,7 @@ func NewHTTPContent(conf []byte) Monitor {
 		time.Now(),
 		0,
 		"",
+		[]string{},
 	)
 	return monitor
 }
@@ -153,5 +155,6 @@ func (m *HTTPContent) Check() {
 		m.status.LastNotification,
 		duration,
 		message,
+		m.config.Notifiers,
 	)
 }

@@ -74,6 +74,10 @@ func NewSlack(conf []byte) Notifier {
 	return notifier
 }
 
+func (n *Slack) Name() string {
+	return n.config.Name
+}
+
 func slackColor(stat *status.Status) string {
 	switch stat.Current {
 	case status.UP:

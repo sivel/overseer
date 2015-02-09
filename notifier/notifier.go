@@ -10,6 +10,7 @@ import (
 
 type Notifier interface {
 	Notify(*status.Status)
+	Name() string
 }
 
 type NewNotifier func([]byte) Notifier

@@ -20,6 +20,7 @@ type ConnectConfig struct {
 	NotificationInterval       time.Duration
 	TimeoutString              string `json:"timeout"`
 	Timeout                    time.Duration
+	Notifiers                  []string
 }
 
 type Connect struct {
@@ -74,6 +75,7 @@ func NewConnect(conf []byte) Monitor {
 		time.Now(),
 		0,
 		"",
+		[]string{},
 	)
 	return monitor
 }
@@ -112,5 +114,6 @@ func (m *Connect) Check() {
 		m.status.LastNotification,
 		duration,
 		message,
+		m.config.Notifiers,
 	)
 }
