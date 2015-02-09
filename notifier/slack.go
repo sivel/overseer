@@ -11,6 +11,8 @@ import (
 )
 
 type SlackConfig struct {
+	Name      string
+	Type      string
 	Token     string
 	Channel   string
 	ChannelID string `json:"channel_id"`
@@ -30,6 +32,10 @@ func NewSlack(conf []byte) Notifier {
 		log.Fatalf("Failed to parse config: %s", err)
 	} else {
 		notifier.config = &config
+	}
+
+	if config.Name == "" {
+		config.Name = config.Type
 	}
 
 	if config.Token == "" {

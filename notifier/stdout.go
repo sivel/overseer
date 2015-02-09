@@ -9,6 +9,7 @@ import (
 )
 
 type StdoutConfig struct {
+	Name string
 	Type string
 }
 
@@ -25,6 +26,11 @@ func NewStdout(conf []byte) Notifier {
 	} else {
 		notifier.config = &config
 	}
+
+	if config.Name == "" {
+		config.Name = config.Type
+	}
+
 	return notifier
 }
 

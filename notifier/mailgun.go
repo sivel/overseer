@@ -11,6 +11,8 @@ import (
 )
 
 type MailgunConfig struct {
+	Name   string
+	Type   string
 	Domain string
 	APIKey string
 	From   string
@@ -30,6 +32,10 @@ func NewMailgun(conf []byte) Notifier {
 		log.Fatalf("Failed to parse config: %s", err)
 	} else {
 		notifier.config = &config
+	}
+
+	if config.Name == "" {
+		config.Name = config.Type
 	}
 
 	if config.Domain == "" {
