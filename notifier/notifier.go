@@ -45,6 +45,19 @@ func ShouldNotify(stat *status.Status) bool {
 	return notify
 }
 
+func NotifierMatch(stat *status.Status, n Notifier) bool {
+	if len(stat.Notifiers) == 0 {
+		return true
+	} else {
+		for _, notifierName := range stat.Notifiers {
+			if n.Name() == notifierName {
+				return true
+			}
+		}
+	}
+	return false
+}
+
 func stateString(stat *status.Status) string {
 	switch stat.Current {
 	case status.UP:
