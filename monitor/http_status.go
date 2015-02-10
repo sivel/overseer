@@ -125,7 +125,7 @@ func (m *HTTPStatus) Check() {
 	}
 
 	requestStart := time.Now()
-	resp, err := client.Do(&http.Request{Method: "HEAD", URL: m.config.URL})
+	resp, err := client.Do(&http.Request{Method: m.config.Method, URL: m.config.URL})
 	duration := time.Now().UnixNano() - requestStart.UnixNano()
 
 	var current int = status.UP

@@ -76,7 +76,7 @@ func NewHTTPContent(conf []byte, filename string) Monitor {
 	}
 
 	if config.Method == "" {
-		config.Method = "HEAD"
+		config.Method = "GET"
 	}
 
 	monitor.status = status.NewStatus(
@@ -117,7 +117,7 @@ func (m *HTTPContent) Check() {
 	}
 
 	requestStart := time.Now()
-	resp, err := client.Do(&http.Request{Method: "GET", URL: m.config.URL})
+	resp, err := client.Do(&http.Request{Method: m.config.Method, URL: m.config.URL})
 	duration := time.Now().UnixNano() - requestStart.UnixNano()
 
 	var current int = status.UP
