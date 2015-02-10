@@ -24,7 +24,7 @@ func GetMonitor(monitorType string) (NewMonitor, error) {
 	case "connect":
 		return NewConnect, nil
 	}
-	return nil, errors.New(fmt.Sprintf("Unsuppported notifier type: %s", monitorType))
+	return nil, errors.New(fmt.Sprintf("Unsuppported monitor type: %s", monitorType))
 }
 
 func checkChanged(current int, last int, startOfLastStatus time.Time) (bool, time.Time) {

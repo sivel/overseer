@@ -42,6 +42,7 @@ func getNotifiers(configPath string) []notifier.Notifier {
 		}
 		notifier, err := notifier.GetNotifier(tmp.Type)
 		if err != nil {
+			log.Printf("%s: %s", err.Error(), f.Name())
 			continue
 		}
 		notifiers = append(notifiers, notifier(text, f.Name()))
@@ -73,6 +74,7 @@ func getMonitors(configPath string) []monitor.Monitor {
 		}
 		monitor, err := monitor.GetMonitor(tmp.Type)
 		if err != nil {
+			log.Printf("%s: %s", err.Error(), f.Name())
 			continue
 		}
 		monitors = append(monitors, monitor(text, f.Name()))
