@@ -11,7 +11,7 @@ In addition to the monitor configurations below, each monitor configuration can 
     ...,
     "notifiers": [
         "Slack status channel",
-        "mailgun ops team"
+        "email ops team"
     ]
 }
 ```
@@ -97,7 +97,7 @@ If you know your channel ID, you can replace `channel` with `channel_id` and use
 ```json
 {
     "type": "mailgun",
-    "name": "mailgun ops team",
+    "name": "email ops team",
     "domain": "overseer.mailgun.org",
     "apikey": "key-goes-here",
     "from": "Overseer <overseer@overseer.mailgun.org>",
