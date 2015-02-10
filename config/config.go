@@ -22,7 +22,7 @@ func getNotifiers(configPath string) []notifier.Notifier {
 	notifierPath := filepath.Join(configPath, "notifiers")
 	files, err := ioutil.ReadDir(notifierPath)
 	if err != nil {
-		log.Fatalf("%s", err)
+		log.Fatalf("Could not list notifiers configuration directory: %s", err)
 	}
 	var notifiers []notifier.Notifier
 	for _, f := range files {
@@ -33,16 +33,18 @@ func getNotifiers(configPath string) []notifier.Notifier {
 		text, err := ioutil.ReadFile(filepath.Join(notifierPath, f.Name()))
 		if err != nil {
 			log.Printf("Could not read configuration file: %s", f.Name())
+			continue
 		}
 		err = json.Unmarshal(text, &tmp)
 		if err != nil {
 			log.Printf("Configuration file not valid JSON: %s", f.Name())
+			continue
 		}
 		notifier, err := notifier.GetNotifier(tmp.Type)
 		if err != nil {
 			continue
 		}
-		notifiers = append(notifiers, notifier(text))
+		notifiers = append(notifiers, notifier(text, f.Name()))
 	}
 	return notifiers
 }
@@ -51,7 +53,7 @@ func getMonitors(configPath string) []monitor.Monitor {
 	monitorPath := filepath.Join(configPath, "monitors")
 	files, err := ioutil.ReadDir(monitorPath)
 	if err != nil {
-		log.Fatalf("%s", err)
+		log.Fatalf("Could not list monitors configuration directory: %s", err)
 	}
 	var monitors []monitor.Monitor
 	for _, f := range files {

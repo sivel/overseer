@@ -13,7 +13,7 @@ type Monitor interface {
 	Watch(chan *status.Status)
 }
 
-type NewMonitor func([]byte) Monitor
+type NewMonitor func([]byte, string) Monitor
 
 func GetMonitor(monitorType string) (NewMonitor, error) {
 	switch monitorType {

@@ -17,15 +17,11 @@ type Stdout struct {
 	config *StdoutConfig
 }
 
-func NewStdout(conf []byte) Notifier {
+func NewStdout(conf []byte, filename string) Notifier {
 	notifier := new(Stdout)
 	var config StdoutConfig
-	err := json.Unmarshal(conf, &config)
-	if err != nil {
-		log.Fatalf("Failed to parse config: %s", err)
-	} else {
-		notifier.config = &config
-	}
+	json.Unmarshal(conf, &config)
+	notifier.config = &config
 
 	if config.Name == "" {
 		config.Name = config.Type

@@ -23,35 +23,31 @@ type Mailgun struct {
 	config *MailgunConfig
 }
 
-func NewMailgun(conf []byte) Notifier {
+func NewMailgun(conf []byte, filename string) Notifier {
 	notifier := new(Mailgun)
 
 	var config MailgunConfig
-	err := json.Unmarshal(conf, &config)
-	if err != nil {
-		log.Fatalf("Failed to parse config: %s", err)
-	} else {
-		notifier.config = &config
-	}
+	json.Unmarshal(conf, &config)
+	notifier.config = &config
 
 	if config.Name == "" {
 		config.Name = config.Type
 	}
 
 	if config.Domain == "" {
-		log.Fatal("Mailgun domain not provided")
+		log.Fatalf("Mailgun domain not provided: %s", filename)
 	}
 
 	if config.APIKey == "" {
-		log.Fatal("Mailgun API Key not provided")
+		log.Fatalf("Mailgun API Key not provided: %s", filename)
 	}
 
 	if config.From == "" {
-		log.Fatal("Mailgun from address not provided")
+		log.Fatalf("Mailgun from address not provided: %s", filename)
 	}
 
 	if len(config.To) == 0 {
-		log.Fatal("Mailgun to address list not provided")
+		log.Fatalf("Mailgun to address list not provided: %s", filename)
 	}
 
 	return notifier
@@ -78,6 +74,6 @@ func (n *Mailgun) Notify(stat *status.Status) {
 	_, _, err := mg.Send(m)
 
 	if err != nil {
-		log.Print("Mailgun notifier: unable to connect to send message")
+		log.Print("Mailgun notifier: unable to send message")
 	}
 }

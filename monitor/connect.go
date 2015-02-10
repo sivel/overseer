@@ -28,23 +28,19 @@ type Connect struct {
 	status *status.Status
 }
 
-func NewConnect(conf []byte) Monitor {
+func NewConnect(conf []byte, filename string) Monitor {
 	var err error
 	monitor := new(Connect)
 	var config ConnectConfig
-	err = json.Unmarshal(conf, &config)
-	if err != nil {
-		log.Fatalf("Failed to parse config: %s", err)
-	} else {
-		monitor.config = &config
-	}
+	json.Unmarshal(conf, &config)
+	monitor.config = &config
 
 	if config.Host == "" {
-		log.Fatalf("No Host provided")
+		log.Fatalf("No Host provided: %s", filename)
 	}
 
 	if config.Port == 0 {
-		log.Fatalf("No Port provided")
+		log.Fatalf("No Port provided: %s", filename)
 	}
 
 	if config.Name == "" {

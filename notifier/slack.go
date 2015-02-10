@@ -23,23 +23,19 @@ type Slack struct {
 	config *SlackConfig
 }
 
-func NewSlack(conf []byte) Notifier {
+func NewSlack(conf []byte, filename string) Notifier {
 	notifier := new(Slack)
 
 	var config SlackConfig
-	err := json.Unmarshal(conf, &config)
-	if err != nil {
-		log.Fatalf("Failed to parse config: %s", err)
-	} else {
-		notifier.config = &config
-	}
+	json.Unmarshal(conf, &config)
+	notifier.config = &config
 
 	if config.Name == "" {
 		config.Name = config.Type
 	}
 
 	if config.Token == "" {
-		log.Fatal("Slack token not provided")
+		log.Fatalf("Slack token not provided: %s", filename)
 	}
 	api := slack.New(config.Token)
 
@@ -49,7 +45,7 @@ func NewSlack(conf []byte) Notifier {
 		}
 		channels, err := api.GetChannels(true)
 		if err != nil {
-			log.Printf("Cannot send message: %s", err)
+			log.Printf("Cannot list Slack channels: %s", err)
 		}
 		for _, channel := range channels {
 			if channel.Name == config.Channel {
@@ -58,7 +54,7 @@ func NewSlack(conf []byte) Notifier {
 			}
 		}
 		if config.ChannelID == "" {
-			log.Printf("Could not locate slack channel: %s", config.Channel)
+			log.Printf("Could not locate Slack channel: %s", config.Channel)
 		}
 
 		_, err = api.GetChannelInfo(config.ChannelID)
@@ -113,6 +109,6 @@ func (n *Slack) Notify(stat *status.Status) {
 	_, _, err := api.PostMessage(n.config.ChannelID, message, params)
 
 	if err != nil {
-		log.Print("Slack notifier: unable to connect to send message")
+		log.Print("Slack notifier: unable to send message")
 	}
 }

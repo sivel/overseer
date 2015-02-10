@@ -13,7 +13,7 @@ type Notifier interface {
 	Name() string
 }
 
-type NewNotifier func([]byte) Notifier
+type NewNotifier func([]byte, string) Notifier
 
 func GetNotifier(notifierType string) (NewNotifier, error) {
 	switch notifierType {

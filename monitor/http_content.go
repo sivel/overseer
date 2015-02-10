@@ -36,28 +36,24 @@ type HTTPContent struct {
 	status *status.Status
 }
 
-func NewHTTPContent(conf []byte) Monitor {
+func NewHTTPContent(conf []byte, filename string) Monitor {
 	var err error
 	monitor := new(HTTPContent)
 	var config HTTPContentConfig
-	err = json.Unmarshal(conf, &config)
-	if err != nil {
-		log.Fatalf("Failed to parse config: %s", err)
-	} else {
-		monitor.config = &config
-	}
+	json.Unmarshal(conf, &config)
+	monitor.config = &config
 
 	if config.URLString == "" {
-		log.Fatalf("No URL provided")
+		log.Fatalf("No URL provided: %s", filename)
 	}
 
 	config.URL, err = url.Parse(config.URLString)
 	if err != nil {
-		log.Fatalf("Invalid URL provided: %s", config.URLString)
+		log.Fatalf("Invalid URL (%s) provided: %s", config.URLString, filename)
 	}
 
 	if config.Content == "" {
-		log.Fatal("No content match provided")
+		log.Fatalf("No content match provided: %s", filename)
 	}
 
 	if config.Name == "" {
