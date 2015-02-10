@@ -8,18 +8,18 @@ import (
 	"github.com/sivel/overseer/status"
 )
 
-type StdoutConfig struct {
+type StderrConfig struct {
 	Name string
 	Type string
 }
 
-type Stdout struct {
-	config *StdoutConfig
+type Stderr struct {
+	config *StderrConfig
 }
 
-func NewStdout(conf []byte, filename string) Notifier {
-	notifier := new(Stdout)
-	var config StdoutConfig
+func NewStderr(conf []byte, filename string) Notifier {
+	notifier := new(Stderr)
+	var config StderrConfig
 	json.Unmarshal(conf, &config)
 	notifier.config = &config
 
@@ -30,11 +30,11 @@ func NewStdout(conf []byte, filename string) Notifier {
 	return notifier
 }
 
-func (n *Stdout) Name() string {
+func (n *Stderr) Name() string {
 	return n.config.Name
 }
 
-func (n *Stdout) Notify(stat *status.Status) {
+func (n *Stderr) Notify(stat *status.Status) {
 	log.Printf(
 		"[%s] %s: %s [%dms] [%s]\n",
 		stateString(stat),

@@ -18,7 +18,7 @@ type NewNotifier func([]byte, string) Notifier
 func GetNotifier(notifierType string) (NewNotifier, error) {
 	switch notifierType {
 	case "stdout":
-		return NewStdout, nil
+		return NewStderr, nil
 	case "mailgun":
 		return NewMailgun, nil
 	case "slack":
