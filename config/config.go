@@ -64,28 +64,24 @@ func getMonitors(configPath string) []monitor.Monitor {
 		text, err := ioutil.ReadFile(filepath.Join(monitorPath, f.Name()))
 		if err != nil {
 			log.Printf("Could not read configuration file: %s", f.Name())
+			continue
 		}
 		err = json.Unmarshal(text, &tmp)
 		if err != nil {
 			log.Printf("Configuration file not valid JSON: %s", f.Name())
+			continue
 		}
 		monitor, err := monitor.GetMonitor(tmp.Type)
 		if err != nil {
 			continue
 		}
-		monitors = append(monitors, monitor(text))
+		monitors = append(monitors, monitor(text, f.Name()))
 	}
 	return monitors
 }
 
 func ParseConfig() ([]monitor.Monitor, []notifier.Notifier) {
-	var config Config
-	configPath, _ := filepath.Abs("/etc/overseer")
-	configFile := filepath.Join(configPath, "overseer.json")
-	text, err := ioutil.ReadFile(configFile)
-	if err == nil {
-		json.Unmarshal(text, &config)
-	}
+	configPath := "/etc/overseer"
 	notifiers := getNotifiers(configPath)
 	monitors := getMonitors(configPath)
 	return monitors, notifiers
