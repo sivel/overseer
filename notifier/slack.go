@@ -74,6 +74,10 @@ func (n *Slack) Name() string {
 	return n.config.Name
 }
 
+func (n *Slack) Type() string {
+	return n.config.Type
+}
+
 func slackColor(stat *status.Status) string {
 	switch stat.Current {
 	case status.UP:

@@ -57,6 +57,10 @@ func (n *Mailgun) Name() string {
 	return n.config.Name
 }
 
+func (n *Mailgun) Type() string {
+	return n.config.Type
+}
+
 func (n *Mailgun) Notify(stat *status.Status) {
 	mg := mailgun.NewMailgun(n.config.Domain, n.config.APIKey, "")
 	m := mg.NewMessage(

@@ -34,6 +34,10 @@ func (n *Stderr) Name() string {
 	return n.config.Name
 }
 
+func (n *Stderr) Type() string {
+	return n.config.Type
+}
+
 func (n *Stderr) Notify(stat *status.Status) {
 	log.Printf(
 		"[%s] %s: %s [%dms] [%s]\n",

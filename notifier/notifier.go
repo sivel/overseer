@@ -11,6 +11,7 @@ import (
 type Notifier interface {
 	Notify(*status.Status)
 	Name() string
+	Type() string
 }
 
 type NewNotifier func([]byte, string) Notifier
@@ -50,7 +51,7 @@ func NotifierMatch(stat *status.Status, n Notifier) bool {
 		return true
 	} else {
 		for _, notifierName := range stat.Notifiers {
-			if n.Name() == notifierName {
+			if n.Name() == notifierName || n.Type() == notifierName {
 				return true
 			}
 		}
