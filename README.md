@@ -16,6 +16,8 @@ In addition to the monitor configurations below, each monitor configuration can 
 }
 ```
 
+The values for the `notifiers` key can either be the notifiers `name` or `type`.
+
 ### http-status
 
 ```json
