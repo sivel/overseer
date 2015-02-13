@@ -27,6 +27,7 @@ type HTTPStatusConfig struct {
 	Timeout                    time.Duration
 	Method                     string
 	Notifiers                  []string
+	Retries                    int
 }
 
 type HTTPStatus struct {
@@ -77,6 +78,10 @@ func NewHTTPStatus(conf []byte, filename string) Monitor {
 		config.Method = "HEAD"
 	}
 
+	if config.Retries == 0 {
+		config.Retries = 3
+	}
+
 	monitor.status = status.NewStatus(
 		config.Name,
 		status.UNKNOWN,
@@ -109,7 +114,7 @@ func isValidCode(code int, codes []int) bool {
 	return valid
 }
 
-func (m *HTTPStatus) Check() {
+func (m *HTTPStatus) check() (int, string) {
 	transport := http.Transport{
 		Dial: func(network, addr string) (net.Conn, error) {
 			return net.DialTimeout(network, addr, m.config.Timeout)
@@ -124,9 +129,7 @@ func (m *HTTPStatus) Check() {
 		Transport: &transport,
 	}
 
-	requestStart := time.Now()
 	resp, err := client.Do(&http.Request{Method: m.config.Method, URL: m.config.URL})
-	duration := time.Now().UnixNano() - requestStart.UnixNano()
 
 	var current int = status.UP
 	var message string = "OK"
@@ -141,6 +144,23 @@ func (m *HTTPStatus) Check() {
 			message = fmt.Sprintf("Invalid response code: %d", resp.StatusCode)
 		}
 	}
+
+	return current, message
+}
+
+func (m *HTTPStatus) Check() {
+	var current int
+	var message string
+
+	requestStart := time.Now()
+	for i := 0; i < m.config.Retries; i++ {
+		current, message = m.check()
+		if current == status.UP {
+			break
+		}
+		time.Sleep(m.config.Timeout)
+	}
+	duration := time.Now().UnixNano() - requestStart.UnixNano()
 
 	_, start := checkChanged(current, m.status.Current, m.status.StartOfCurrentStatus)
 

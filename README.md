@@ -33,7 +33,8 @@ The values for the `notifiers` key can either be the notifiers `name` or `type`.
     "notification_interval": "30m",
     "timeout": "2s",
     "verify": false,
-    "method": "HEAD"
+    "method": "HEAD",
+    "retries": 3
 }
 ```
 
@@ -49,7 +50,8 @@ The values for the `notifiers` key can either be the notifiers `name` or `type`.
     "notification_interval": "30m",
     "timeout": "2s",
     "verify": false,
-    "method": "HEAD"
+    "method": "HEAD",
+    "retries": 3
 }
 ```
 
@@ -63,7 +65,8 @@ The values for the `notifiers` key can either be the notifiers `name` or `type`.
     "port": 80,
     "check_interval": "10s",
     "notification_interval": "30m",
-    "timeout": "2s"
+    "timeout": "2s",
+    "retries": 3
 }
 ```
 

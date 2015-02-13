@@ -21,6 +21,7 @@ type ConnectConfig struct {
 	TimeoutString              string `json:"timeout"`
 	Timeout                    time.Duration
 	Notifiers                  []string
+	Retries                    int
 }
 
 type Connect struct {
@@ -62,6 +63,10 @@ func NewConnect(conf []byte, filename string) Monitor {
 		config.Timeout = time.Second * 2
 	}
 
+	if config.Retries == 0 {
+		config.Retries = 3
+	}
+
 	monitor.status = status.NewStatus(
 		config.Name,
 		status.UNKNOWN,
@@ -85,8 +90,17 @@ func (m *Connect) Watch(statusChan chan *status.Status) {
 }
 
 func (m *Connect) Check() {
+	var err error = nil
+	var conn net.Conn
+
 	requestStart := time.Now()
-	conn, err := net.DialTimeout("tcp", fmt.Sprintf("%s:%d", m.config.Host, m.config.Port), m.config.Timeout)
+	for i := 0; i < m.config.Retries; i++ {
+		conn, err = net.DialTimeout("tcp", fmt.Sprintf("%s:%d", m.config.Host, m.config.Port), m.config.Timeout)
+		if err == nil {
+			break
+		}
+		time.Sleep(m.config.Timeout)
+	}
 	duration := time.Now().UnixNano() - requestStart.UnixNano()
 
 	var message string = "OK"
