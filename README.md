@@ -89,7 +89,7 @@ Notifier configurations live at `/etc/overseer/notifiers` and each file must hav
 {
     "type": "slack",
     "name": "Slack status channel",
-    "token": "oauth2_token_here",
+    "webhook_url": "https://hooks.slack.com/services/stuff/goes/here",
     "channel": "status",
     "username": "overseer"
 }

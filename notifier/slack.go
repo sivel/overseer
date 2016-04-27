@@ -1,26 +1,71 @@
 package notifier
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"log"
+	"net/http"
 	"time"
 
-	"github.com/nlopes/slack"
 	"github.com/sivel/overseer/status"
 )
 
 type SlackConfig struct {
-	Name      string
-	Type      string
-	Token     string
-	Channel   string
-	ChannelID string `json:"channel_id"`
-	Username  string
+	Name       string
+	Type       string
+	WebhookURL string `json:"webhook_url"`
+	Channel    string
+	Username   string
 }
 
 type Slack struct {
 	config *SlackConfig
+}
+
+type Message struct {
+	Text        string        `json:"text"`
+	Username    string        `json:"username"`
+	IconUrl     string        `json:"icon_url"`
+	IconEmoji   string        `json:"icon_emoji"`
+	Channel     string        `json:"channel"`
+	UnfurlLinks bool          `json:"unfurl_links"`
+	Attachments []*Attachment `json:"attachments"`
+}
+
+func (m *Message) NewAttachment() *Attachment {
+	a := &Attachment{}
+	m.AddAttachment(a)
+	return a
+}
+
+func (m *Message) AddAttachment(a *Attachment) {
+	m.Attachments = append(m.Attachments, a)
+}
+
+type Attachment struct {
+	Fallback string   `json:"fallback"`
+	Text     string   `json:"text"`
+	Pretext  string   `json:"pretext"`
+	Color    string   `json:"color"`
+	Fields   []*Field `json:"fields"`
+	MrkdwnIn []string `json:"mrkdwn_in"`
+}
+
+func (a *Attachment) NewField() *Field {
+	f := &Field{}
+	a.AddField(f)
+	return f
+}
+
+func (a *Attachment) AddField(f *Field) {
+	a.Fields = append(a.Fields, f)
+}
+
+type Field struct {
+	Title string `json:"title"`
+	Value string `json:"value"`
+	Short bool   `json:"short"`
 }
 
 func NewSlack(conf []byte, filename string) Notifier {
@@ -34,37 +79,8 @@ func NewSlack(conf []byte, filename string) Notifier {
 		config.Name = config.Type
 	}
 
-	if config.Token == "" {
-		log.Fatalf("Slack token not provided: %s", filename)
-	}
-	api := slack.New(config.Token)
-
-	if config.ChannelID == "" {
-		if config.Channel == "" {
-			config.Channel = "overseer"
-		}
-		channels, err := api.GetChannels(true)
-		if err != nil {
-			log.Printf("Cannot list Slack channels: %s", err)
-		}
-		for _, channel := range channels {
-			if channel.Name == config.Channel {
-				config.ChannelID = channel.Id
-				break
-			}
-		}
-		if config.ChannelID == "" {
-			log.Printf("Could not locate Slack channel: %s", config.Channel)
-		}
-
-		_, err = api.GetChannelInfo(config.ChannelID)
-		if err != nil {
-			log.Fatalf("Slack channel does not exist")
-		}
-	}
-
-	if config.Username == "" {
-		config.Username = "overseer"
+	if config.WebhookURL == "" {
+		log.Fatalf("Slack webhook URL not provided: %s", filename)
 	}
 
 	return notifier
@@ -89,30 +105,42 @@ func slackColor(stat *status.Status) string {
 }
 
 func (n *Slack) Notify(stat *status.Status) {
-	api := slack.New(n.config.Token)
 
-	params := slack.PostMessageParameters{
-		Username: n.config.Username,
+	msg := Message{
+		Text: fmt.Sprintf("[%s] %s", stateString(stat), stat.MonitorName),
 	}
-	attachment := slack.Attachment{
-		Color: slackColor(stat),
-		Fields: []slack.AttachmentField{
-			slack.AttachmentField{
-				Title: stateString(stat),
-				Value: fmt.Sprintf(
-					"%s [%dms] [%s]",
-					stat.Message,
-					stat.CheckDuration/1000000,
-					time.Since(stat.StartOfCurrentStatus),
-				),
-			},
-		},
-	}
-	params.Attachments = []slack.Attachment{attachment}
-	message := fmt.Sprintf("[%s] %s", stateString(stat), stat.MonitorName)
-	_, _, err := api.PostMessage(n.config.ChannelID, message, params)
 
+	if n.config.Username != "" {
+		msg.Username = n.config.Username
+	}
+
+	if n.config.Channel != "" {
+		msg.Channel = n.config.Channel
+	}
+
+	attach := msg.NewAttachment()
+	attach.Color = slackColor(stat)
+
+	field := attach.NewField()
+	field.Title = stateString(stat)
+	field.Value = fmt.Sprintf(
+		"%s [%dms] [%s]",
+		stat.Message,
+		stat.CheckDuration/1000000,
+		time.Since(stat.StartOfCurrentStatus),
+	)
+
+	body, _ := json.Marshal(msg)
+	buf := bytes.NewReader(body)
+
+	resp, err := http.Post(n.config.WebhookURL, "application/json", buf)
 	if err != nil {
 		log.Print("Slack notifier: unable to send message")
+		return
+	}
+
+	if resp.StatusCode != 200 {
+		log.Print("Slack notifier: unable to send message")
+		return
 	}
 }
