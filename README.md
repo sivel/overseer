@@ -90,12 +90,10 @@ Notifier configurations live at `/etc/overseer/notifiers` and each file must hav
     "type": "slack",
     "name": "Slack status channel",
     "webhook_url": "https://hooks.slack.com/services/stuff/goes/here",
-    "channel": "status",
+    "channel": "#status",
     "username": "overseer"
 }
 ```
-
-If you know your channel ID, you can replace `channel` with `channel_id` and use the channel ID instead of a channel name.
 
 ### mailgun
 
