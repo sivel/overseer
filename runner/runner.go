@@ -34,13 +34,16 @@ func (r *Runner) Loop() {
 
 	for {
 		stat := <-r.StatusChan
-		if !notifier.ShouldNotify(stat) {
-			continue
-		}
-		for _, n := range r.Notifiers {
-			if notifier.NotifierMatch(stat, n) {
-				n.Notify(stat)
+		go func(stat *status.Status) {
+			if notifier.ShouldNotify(stat) {
+				for _, n := range r.Notifiers {
+					go func(stat *status.Status, n notifier.Notifier) {
+						if notifier.NotifierMatch(stat, n) {
+							n.Notify(stat)
+						}
+					}(stat, n)
+				}
 			}
-		}
+		}(stat)
 	}
 }
