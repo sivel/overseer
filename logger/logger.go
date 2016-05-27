@@ -19,6 +19,8 @@ func GetLogger(loggerType string) (NewLogger, error) {
 	switch loggerType {
 	case "stderr":
 		return NewStderr, nil
+	case "mongodb":
+		return NewMongoDB, nil
 	}
 	return nil, errors.New(fmt.Sprintf("Unsuppported logger type: %s", loggerType))
 }
