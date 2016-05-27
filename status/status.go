@@ -19,13 +19,14 @@ type Status struct {
 	Message              string
 	Time                 time.Time
 	Notifiers            []string
+	Loggers              []string
 }
 
 func NewStatus(
 	monitorName string, current int, last int,
 	notificationInterval time.Duration, startOfCurrentStatus time.Time,
 	lastNotification time.Time, checkDuration int64, message string,
-	notifiers []string,
+	notifiers []string, loggers []string,
 ) *Status {
 	return &Status{
 		MonitorName:          monitorName,
@@ -38,6 +39,7 @@ func NewStatus(
 		Message:              message,
 		Time:                 time.Now(),
 		Notifiers:            notifiers,
+		Loggers:              loggers,
 	}
 }
 

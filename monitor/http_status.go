@@ -27,6 +27,7 @@ type HTTPStatusConfig struct {
 	Timeout                    time.Duration
 	Method                     string
 	Notifiers                  []string
+	Loggers                    []string
 	Retries                    int
 }
 
@@ -91,6 +92,7 @@ func NewHTTPStatus(conf []byte, filename string) Monitor {
 		time.Now(),
 		0,
 		"",
+		[]string{},
 		[]string{},
 	)
 	return monitor
@@ -174,5 +176,6 @@ func (m *HTTPStatus) Check() {
 		duration,
 		message,
 		m.config.Notifiers,
+		m.config.Loggers,
 	)
 }

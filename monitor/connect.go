@@ -21,6 +21,7 @@ type ConnectConfig struct {
 	TimeoutString              string `json:"timeout"`
 	Timeout                    time.Duration
 	Notifiers                  []string
+	Loggers                    []string
 	Retries                    int
 }
 
@@ -77,6 +78,7 @@ func NewConnect(conf []byte, filename string) Monitor {
 		0,
 		"",
 		[]string{},
+		[]string{},
 	)
 	return monitor
 }
@@ -125,5 +127,6 @@ func (m *Connect) Check() {
 		duration,
 		message,
 		m.config.Notifiers,
+		m.config.Loggers,
 	)
 }
