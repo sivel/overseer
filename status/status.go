@@ -1,8 +1,6 @@
 package status
 
-import (
-	"time"
-)
+import "time"
 
 const (
 	DOWN    int = 0
@@ -41,4 +39,16 @@ func NewStatus(
 		Time:                 time.Now(),
 		Notifiers:            notifiers,
 	}
+}
+
+func StateString(stat *Status) string {
+	switch stat.Current {
+	case UP:
+		return "ok"
+	case DOWN:
+		return "critical"
+	case UNKNOWN:
+		return "unknown"
+	}
+	return "unknown"
 }

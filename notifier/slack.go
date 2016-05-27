@@ -107,7 +107,7 @@ func slackColor(stat *status.Status) string {
 func (n *Slack) Notify(stat *status.Status) {
 
 	msg := Message{
-		Text: fmt.Sprintf("[%s] %s", stateString(stat), stat.MonitorName),
+		Text: fmt.Sprintf("[%s] %s", status.StateString(stat), stat.MonitorName),
 	}
 
 	if n.config.Username != "" {
@@ -122,7 +122,7 @@ func (n *Slack) Notify(stat *status.Status) {
 	attach.Color = slackColor(stat)
 
 	field := attach.NewField()
-	field.Title = stateString(stat)
+	field.Title = status.StateString(stat)
 	field.Value = fmt.Sprintf(
 		"%s [%dms] [%s]",
 		stat.Message,

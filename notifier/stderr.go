@@ -41,7 +41,7 @@ func (n *Stderr) Type() string {
 func (n *Stderr) Notify(stat *status.Status) {
 	log.Printf(
 		"[%s] %s: %s [%dms] [%s]\n",
-		stateString(stat),
+		status.StateString(stat),
 		stat.MonitorName,
 		stat.Message,
 		stat.CheckDuration/1000000,

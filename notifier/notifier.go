@@ -58,15 +58,3 @@ func NotifierMatch(stat *status.Status, n Notifier) bool {
 	}
 	return false
 }
-
-func stateString(stat *status.Status) string {
-	switch stat.Current {
-	case status.UP:
-		return "ok"
-	case status.DOWN:
-		return "critical"
-	case status.UNKNOWN:
-		return "unknown"
-	}
-	return "unknown"
-}

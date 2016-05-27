@@ -65,7 +65,7 @@ func (n *Mailgun) Notify(stat *status.Status) {
 	mg := mailgun.NewMailgun(n.config.Domain, n.config.APIKey, "")
 	m := mg.NewMessage(
 		n.config.From,
-		fmt.Sprintf("[%s] %s", stateString(stat), stat.MonitorName),
+		fmt.Sprintf("[%s] %s", status.StateString(stat), stat.MonitorName),
 		fmt.Sprintf(
 			"%s [%dms] [%s]",
 			stat.Message,
