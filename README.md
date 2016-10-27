@@ -4,7 +4,7 @@
 
 Monitor configurations live at `/etc/overseer/monitors` and each file must have a `.json` file extension.
 
-In addition to the monitor configurations below, each monitor configuration can also name specific notifiers that it should use such as:
+In addition to the monitor configurations below, each monitor configuration can also name specific notifiers and loggers that it should use such as:
 
 ```json
 {
@@ -12,6 +12,9 @@ In addition to the monitor configurations below, each monitor configuration can 
     "notifiers": [
         "Slack status channel",
         "email ops team"
+    ],
+    "loggers": [
+        "mongodb"
     ]
 }
 ```
