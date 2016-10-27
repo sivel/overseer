@@ -14,6 +14,7 @@ type ConnectConfig struct {
 	Name                       string
 	Host                       string
 	Port                       int
+	Protocol                   string
 	CheckIntervalString        string `json:"check_interval"`
 	CheckInterval              time.Duration
 	NotificationIntervalString string `json:"notification_interval"`
@@ -46,6 +47,14 @@ func NewConnect(conf []byte, filename string) Monitor {
 
 	if config.Name == "" {
 		config.Name = fmt.Sprintf("%s:%d", config.Host, config.Port)
+	}
+
+	if config.Protocol == "" {
+		config.Protocol = "tcp"
+	}
+
+	if config.Protocol != "tcp" || config.Protcol != "udp" {
+		log.Fatalf("Invalid Protocol specified: %s", filename)
 	}
 
 	config.CheckInterval, err = time.ParseDuration(config.CheckIntervalString)
@@ -95,7 +104,7 @@ func (m *Connect) Check() {
 
 	requestStart := time.Now()
 	for i := 0; i < m.config.Retries; i++ {
-		conn, err = net.DialTimeout("tcp", fmt.Sprintf("%s:%d", m.config.Host, m.config.Port), m.config.Timeout)
+		conn, err = net.DialTimeout(m.config.Protocol, fmt.Sprintf("%s:%d", m.config.Host, m.config.Port), m.config.Timeout)
 		if err == nil {
 			break
 		}
