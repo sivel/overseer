@@ -29,6 +29,7 @@ type HTTPContentConfig struct {
 	Timeout                    time.Duration
 	Method                     string
 	Notifiers                  []string
+	Loggers                    []string
 	Retries                    int
 }
 
@@ -93,6 +94,7 @@ func NewHTTPContent(conf []byte, filename string) Monitor {
 		time.Now(),
 		0,
 		"",
+		[]string{},
 		[]string{},
 	)
 	return monitor
@@ -173,5 +175,6 @@ func (m *HTTPContent) Check() {
 		duration,
 		message,
 		m.config.Notifiers,
+		m.config.Loggers,
 	)
 }

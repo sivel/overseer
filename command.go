@@ -12,7 +12,7 @@ func init() {
 }
 
 func main() {
-	monitors, notifiers := config.ParseConfig()
-	run := runner.NewRunner(monitors, notifiers)
+	monitors, notifiers, loggers := config.ParseConfig()
+	run := runner.NewRunner(monitors, notifiers, loggers)
 	run.Loop()
 }
