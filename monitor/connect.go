@@ -54,7 +54,7 @@ func NewConnect(conf []byte, filename string) Monitor {
 		config.Protocol = "tcp"
 	}
 
-	if config.Protocol != "tcp" || config.Protocol != "udp" {
+	if config.Protocol != "tcp" && config.Protocol != "udp" {
 		log.Fatalf("Invalid Protocol specified: %s", filename)
 	}
 
