@@ -120,7 +120,7 @@ Notifier configurations live at `/etc/overseer/notifiers` and each file must hav
 
 Logger configurations live at `/etc/overseer/loggers` and each file must have a `.json` file extension.
 
-Loggers differ from notifiers in that they log ever status check result, as opposed to just resusults
+Loggers differ from notifiers in that they log every status check result, as opposed to just results
 from status changing state.  This is useful for creating historical response time graphs.
 
 ### stderr
