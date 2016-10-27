@@ -138,3 +138,19 @@ from status changing state.  This is useful for creating historical response tim
     "mongodb_uri": "mongodb://localhost/overseer"
 }
 ```
+
+### elasticsearch
+
+```json
+{
+    "type": "elasticsearch",
+    "name": "elasticsearch logger",
+    "servers": [
+        "http://127.0.0.1:9200"
+    ],
+    "username": "elastic_user",
+    "password": "elastic_pass",
+    "index": "overseer",
+    "doc_type": "log"
+}
+```

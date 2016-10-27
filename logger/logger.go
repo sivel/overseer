@@ -21,6 +21,8 @@ func GetLogger(loggerType string) (NewLogger, error) {
 		return NewStderr, nil
 	case "mongodb":
 		return NewMongoDB, nil
+	case "elasticsearch":
+		return NewElasticsearch, nil
 	}
 	return nil, errors.New(fmt.Sprintf("Unsuppported logger type: %s", loggerType))
 }
