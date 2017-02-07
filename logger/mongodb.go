@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"log"
 
-	"labix.org/v2/mgo"
+	"gopkg.in/mgo.v2"
 
 	"github.com/sivel/overseer/status"
 )
