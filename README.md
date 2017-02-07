@@ -65,7 +65,7 @@ The values for the `notifiers` key can either be the notifiers `name` or `type`.
     "type": "connect",
     "name": "localhost port 80",
     "host": "localhost",
-    "protocol: "tcp",
+    "protocol": "tcp",
     "port": 80,
     "check_interval": "10s",
     "notification_interval": "30m",
