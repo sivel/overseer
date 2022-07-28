@@ -75,9 +75,14 @@ func (n *Mailgun) Notify(stat *status.Status) {
 		n.config.To...,
 	)
 
-	_, _, err := mg.Send(m)
+	for i := 1; i < 60; i++ {
+		_, _, err := mg.Send(m)
 
-	if err != nil {
-		log.Print("Mailgun notifier: unable to send message")
+		if err != nil {
+			log.Print("Mailgun notifier: unable to send message")
+			time.Sleep(5 * time.Second)
+		} else {
+			break
+		}
 	}
 }
