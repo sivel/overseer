@@ -116,7 +116,7 @@ func (m *HTTPContent) check() (int, string) {
 	}
 
 	if m.config.URL.Scheme == "https" {
-		transport.TLSClientConfig = &tls.Config{InsecureSkipVerify: m.config.Verify}
+		transport.TLSClientConfig = &tls.Config{InsecureSkipVerify: !m.config.Verify}
 	}
 
 	client := http.Client{
